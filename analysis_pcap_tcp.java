@@ -1,5 +1,6 @@
 import org.jnetpcap.*;
-
+import java.nio.*;
+import java.util.ArrayList; 
 class analysis_pcap_tcp{
 	//  javac -classpath jnetpcap.jar analysis_pcap_tcp.java to compile using the imported library
 	
@@ -8,12 +9,23 @@ class analysis_pcap_tcp{
     ///     could be \windows or \windows\system32 directory.
 	
 	public static void main(String[] args){
-		StringBuilder errbuf = new StringBuilder();
 		String pcapFile = "assignment2.pcap";
-		Pcap pcap = Pcap.openOffline(pcapFile, errbuf);
-	
-		System.out.println(pcap.toString());
-
+		ArrayList<byte[]> packetsFromFile = readPacktsFromFile(pcapFile);
+		System.out.println(packetsFromFile.size());
 	}
+	public static ArrayList<byte[]> readPacktsFromFile(String filePath) {
+		final ArrayList<byte[]> packets = new ArrayList<byte[]>();
+		StringBuilder errbuf = new StringBuilder();
+		Pcap pcap = Pcap.openOffline(filePath, errbuf);
+		ByteBufferHandler<String> handler = new ByteBufferHandler<String>() {
+			public void nextPacket(PcapHeader arg0, ByteBuffer buffer, String arg2) {
+				byte[] b = new byte[buffer.capacity()];
+				buffer.get(b);
+				packets.add(b);
+			}
+		};
 
+		pcap.loop(Pcap.LOOP_INFINITE, handler, "");
+		return packets;
+	}
 }
