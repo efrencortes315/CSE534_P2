@@ -23,21 +23,36 @@ class analysis_pcap_tcp{
 		long[][] table = new long[packetsFromFile.size()][3];// 0:seq 1:ack 2:rwind 
 		ArrayList<Integer> theFlowPortNums = new ArrayList<Integer>();
 		
-		ArrayList<ArrayList<byte[]>> fuck = new ArrayList<ArrayList<byte[]>>(); 
+		ArrayList<ArrayList<byte[]>> whoa = new ArrayList<ArrayList<byte[]>>(); 
 		
 		for(int i=0;i<packetsFromFile.size();i++){ //this will go through each packet
 						
-			if(packetsFromFile.get(i)[47]==2){  // packet of type SYN is sent, initiating a new TCP flow  1 would be for FIN and 16 for ACK
 				int byte34 = packetsFromFile.get(i)[34];//34 and 35 for port numb
 				if(byte34<0){byte34+=256;}
 				int byte35 = packetsFromFile.get(i)[35];
 				if(byte35<0){byte35+=256;}
 				
-				int port = (byte34<<8)+byte35;
-				theFlowPortNums.add(port); //this number will match the list of its port
-				numFlows++;
-				fuck.add(new ArrayList<byte[]>());
+				int oPort = (byte34<<8)+byte35;			
+						
+				int byte36 = packetsFromFile.get(i)[36];//34 and 35 for port numb
+				if(byte36<0){byte36+=256;}
+				int byte37 = packetsFromFile.get(i)[37];
+				if(byte37<0){byte37+=256;}
 				
+				int rPort = (byte36<<8)+byte37;
+				
+			if(packetsFromFile.get(i)[47]==2){  // packet of type SYN is sent, initiating a new TCP flow  1 would be for FIN and 16 for ACK
+				
+				theFlowPortNums.add(oPort); //this number will match the list of its port
+				numFlows++;
+				whoa.add(new ArrayList<byte[]>());
+				
+			}
+			for(int j=0;j<theFlowPortNums.size();j++){
+				if(theFlowPortNums.get(j) == oPort || theFlowPortNums.get(j) == rPort){
+					whoa.get(j).add(packetsFromFile.get(i));
+					
+				}
 			}
 			
 			//Sequence Number Calculation// bytes 38-41
@@ -100,7 +115,8 @@ class analysis_pcap_tcp{
 			System.out.println(table[0][2]);
 			System.out.println(table[67][1]);
 			System.out.println(theFlowPortNums.toString()); 
-			
+			System.out.println(whoa.get(0).size() + whoa.get(1).size() + whoa.get(2).size());
+			System.out.println(packetsFromFile.size());
 		
 		
 	}
