@@ -20,11 +20,34 @@ class analysis_pcap_tcp{
 	public static void main(String[] args){
 		String pcapFile = "assignment2.pcap";
 		ArrayList<byte[]> packetsFromFile = readPacktsFromFile(pcapFile);
-		long[][] table = new long[packetsFromFile.size()][3];// 0:seq 1:ack 2:rwind 
+		
 		ArrayList<Integer> theFlowPortNums = new ArrayList<Integer>();
+		long[][] table = packInfo(theFlowPortNums, packetsFromFile);// 0:seq 1:ack 2:rwind 3:sendPort 4:receivePort
 		
-		ArrayList<ArrayList<byte[]>> whoa = new ArrayList<ArrayList<byte[]>>(); 
 		
+			int i=0;
+			int j=0;
+			while(i<40){
+				
+				if(theFlowPortNums.get(0)== table[j][3] || theFlowPortNums.get(0)==table[j][4]){
+					System.out.println("Seq: " + table[j][0] + " Ack: " + table[j][1] + " RWind: " + table[j][2] + " From: " + table[j][3] + " To: " + table[j][4]);
+					i++;
+				
+				}
+			j++;
+			}
+			
+			System.out.println(table[0][2]);
+			System.out.println(table[67][1]);
+			System.out.println(theFlowPortNums.toString()); 
+			
+			System.out.println(packetsFromFile.size());
+		
+			
+		
+	}
+	public static long[][] packInfo(ArrayList<Integer>theFlowPortNums, ArrayList<byte[]> packetsFromFile){
+		long[][] table = new long[packetsFromFile.size()][5];
 		for(int i=0;i<packetsFromFile.size();i++){ //this will go through each packet
 						
 				int byte34 = packetsFromFile.get(i)[34];//34 and 35 for port numb
@@ -33,26 +56,20 @@ class analysis_pcap_tcp{
 				if(byte35<0){byte35+=256;}
 				
 				int oPort = (byte34<<8)+byte35;			
-						
+				table[i][3] = oPort;
 				int byte36 = packetsFromFile.get(i)[36];//34 and 35 for port numb
 				if(byte36<0){byte36+=256;}
 				int byte37 = packetsFromFile.get(i)[37];
 				if(byte37<0){byte37+=256;}
 				
 				int rPort = (byte36<<8)+byte37;
-				
+				table[i][4] = rPort;
 			if(packetsFromFile.get(i)[47]==2){  // packet of type SYN is sent, initiating a new TCP flow  1 would be for FIN and 16 for ACK
 				
 				theFlowPortNums.add(oPort); //this number will match the list of its port
 				numFlows++;
-				whoa.add(new ArrayList<byte[]>());
 				
-			}
-			for(int j=0;j<theFlowPortNums.size();j++){
-				if(theFlowPortNums.get(j) == oPort || theFlowPortNums.get(j) == rPort){
-					whoa.get(j).add(packetsFromFile.get(i));
-					
-				}
+				
 			}
 			
 			//Sequence Number Calculation// bytes 38-41
@@ -69,17 +86,7 @@ class analysis_pcap_tcp{
 			int byte41 = packetsFromFile.get(i)[41];
 			if(byte41<0){byte41+=256;}
 			seqNum = (seqNum << 8) + (long)byte41;
-			/*if(i==0){
-				BigInteger a = new BigInteger(Integer.toString(byte38));
-				a = a.shiftLeft(8).add(new BigInteger(Integer.toString(byte39)));
-				a = a.shiftLeft(8).add(new BigInteger(Integer.toString(byte40)));
-				a = a.shiftLeft(8).add(new BigInteger(Integer.toString(byte41)));
-				
-				System.out.println(byte38 + " " + byte39 + " " + byte40 + " " + byte41);
-				
-				System.out.println(a);
-				System.out.println(seqNum);
-			}*/ //keeping this just in case numbers get too large to handle with longs
+			
 			table[i][0] = seqNum;
 			//end Sequence Number Calculation//
 			
@@ -107,20 +114,11 @@ class analysis_pcap_tcp{
 			int byte49 = packetsFromFile.get(i)[49];
 			if(byte49<0){ byte49+=256;}
 			long rWindow = (byte48 << 8)+ byte49;
-			table[i][2] = rWindow;
+			table[i][2] = rWindow; //apparently, besides in the initial handshake, 
 			//end Receiving Window Calculation//
 		}
-			
-			
-			System.out.println(table[0][2]);
-			System.out.println(table[67][1]);
-			System.out.println(theFlowPortNums.toString()); 
-			System.out.println(whoa.get(0).size() + whoa.get(1).size() + whoa.get(2).size());
-			System.out.println(packetsFromFile.size());
-		
-		
+		return table;
 	}
-
 	public static ArrayList<byte[]> readPacktsFromFile(String filePath) {
 		final ArrayList<byte[]> packets = new ArrayList<byte[]>();
 		StringBuilder errbuf = new StringBuilder();
