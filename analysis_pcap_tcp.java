@@ -19,32 +19,50 @@ class analysis_pcap_tcp{
 	
 	public static void main(String[] args){
 		String pcapFile = "assignment2.pcap";
-		ArrayList<byte[]> packetsFromFile = readPacktsFromFile(pcapFile);
+		ArrayList<byte[]> packetsFromFile = readPacktsFromFile(pcapFile); // reads packets from file and converts into accessible byte array
 		
-		ArrayList<Integer> theFlowPortNums = new ArrayList<Integer>();
+		ArrayList<Integer> theFlowPortNums = new ArrayList<Integer>(); // finds each outgoing port number, signifying each different flow initiated
 		long[][] table = packInfo(theFlowPortNums, packetsFromFile);// 0:seq 1:ack 2:rwind 3:sendPort 4:receivePort
 		
 		
-			int i=0;
+			
+		
+		outputPacketInfo(theFlowPortNums,table, 20); //takes all of the information and displays neatly, the first n transactions per flow
+			
+			
+			
+			
+		
+			
+		
+	}
+	
+	public static void outputPacketInfo(ArrayList<Integer>theFlowPortNums, long[][]table, int length){
+		int i=0;
 			int j=0;
-			while(i<40){
+		System.out.println("Total of number of flows initiated by the sender is: " + numFlows);
+		System.out.println();
+		for(int q = 0;q<theFlowPortNums.size();q++){
+			while(i<length){
 				
-				if(theFlowPortNums.get(0)== table[j][3] || theFlowPortNums.get(0)==table[j][4]){
-					System.out.println("Seq: " + table[j][0] + " Ack: " + table[j][1] + " RWind: " + table[j][2] + " From: " + table[j][3] + " To: " + table[j][4]);
+				if(theFlowPortNums.get(q)== table[j][3] || theFlowPortNums.get(q)==table[j][4]){
+					//if(initSeq<=0){initSeq=table[j][0];}
+					//if(initAck<=0){initAck=table[j][1];}
+					String asl="";
+					String asb="";
+					if(table[j][3]==80){asl = "\t";}
+					if(table[j][1]==0){asb = "\t";}
+					System.out.println("Seq: " + table[j][0] + "\t\tAck: " + table[j][1] + asb + "\t\tRWind: " + table[j][2] + "\t\tFrom:" + table[j][3] +asl+ "\tTo: " + table[j][4]);
 					i++;
 				
 				}
 			j++;
 			}
-			
-			System.out.println(table[0][2]);
-			System.out.println(table[67][1]);
-			System.out.println(theFlowPortNums.toString()); 
-			
-			System.out.println(packetsFromFile.size());
-		
-			
-		
+			i=0;
+			j=0;
+			System.out.println();System.out.println();
+			//delete this for loop to restore
+		}
 	}
 	public static long[][] packInfo(ArrayList<Integer>theFlowPortNums, ArrayList<byte[]> packetsFromFile){
 		long[][] table = new long[packetsFromFile.size()][5];

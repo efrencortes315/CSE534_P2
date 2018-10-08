@@ -1,0 +1,90 @@
+Efren Cortes
+CSE 534
+Project 2 Answers
+
+1)There were 3 initiated TCP flows
+
+2)
+	A) For the first 2 transactions after the TCP connection is set up (from sender to receiver),
+	get the values of the Sequence number, Ack number, and Receive Window size. Explain
+	these values.
+	
+	For the first TCP flow, initiated between port 43498 of 130.208.2.198 and port 80 of 128.208.2.198:
+	
+	After the 3 way handshake is completed, on the fourth mesage, we have a sequence # of 705669103, an acknowledgement number of 1921750144, and an RWindow of 3.
+	Both the relative sequence number and the relative acknowledgement number are actually 1, and the window size is actually 49152.
+	This is because the SYN started with a Seq of 705669102, the SYN ACK responded with an initial Ack of 705669103 and the window size is scaled by 16384.
+	This message usually carries the request
+	
+	The next sent has a Seq of 705669127, which would be a relative sequence of 25 suggesting that the prior payload was 24 bytes long.  
+	The Ack remains 1921750144, indicating no data was received from the receiver.  The RWindow remains 3 indicating we have not yet dealth with
+	any known packet loss.
+	
+	This is followed by another message, from sender to receiver, with Seq of 705670757, Ack of  1921750144, and RWindow of 3.
+	This shows a relative Seq of 1473, indicating that 1448 bytes of data (following the previos 24).
+	The relative ack remains 1, because there has been no payload received from the receiver.
+	the RWindow remains 3, because there has been no loss as far as we known
+	
+	Eight more packets are sent before receiving an Acknowledgement from the receiver.
+	
+	In this response we see a Seq of 1921750144, Ack of 705669127 and RWindow of 3.
+	This is the first outgoing message besides the SYN ACK, so the relative Seq stays at 1 because there has been no outgoing payload.
+	The relative Ack however acknowledges the receipt of the first payload carrying TCP message (whos Seq number was the same), this is a relative ACK of 25
+	
+	Two more packets are still sent before receiving the next Acknowledgement from the receiver
+	
+	The next response from the receiver carries a Seq of 1921750144, an Ack of 705670575, and an RWindow of 3
+	The Sequence here shows that no outgoing payload has been sent from the receiver
+	The Ack of 705670757 acknowledges the receipt of the prior message sent from sender to receiver, which had this number for its Seq.
+	It is a relative Ack of 1473
+	
+	
+	For the second TCP flow, initiated between port 43500 of 130.208.2.198 and port 80 of 128.208.2.198:
+	
+	After the 3 way handshake is completed, on the fourth message, we have a Seq number of 3636173852 , an Ack of 2335809728, and a RWindow of 3
+	or the relative equivalents would be 1, 1, and 49152.
+	
+	The next message sent is from the sender to the receiver.  It has a seq of 3636173876, an ack of 2335809728, and a RWindow of 3.
+	This indicates that a packet of size 24 is being sent.  The ack hasnt changed, showing that no payload has gone from receiver to sender
+	and the Rwindow remains 3, showing that there has been no packet loss reported.
+	
+	The next message, again is sent from the sender to the receiver.  It has a seq of 3636175324, an ack of  2335809728, and Rwindow of 3.
+	This shows that the tcp payload being sent from sender to receiver here is of length 1448, because the relative seq is now 1473.
+	The ack remains the same, showing that no data has been received by the sender from the receiver
+	The Rwindow remains 3, showing that no packets are known to be missing yet.
+	
+	7 more packets are sent from the sender to receiver before the receiver responds to the sender
+	
+	The first response from receiver to sender contains a seq of 2335809728, an ack of 3636173876, and an RWindow of 3.
+	The seq remains the same as earlier, maintaining a relative seq of 1, showing that no payload is being transmitted.
+	The ack represents a relative ack of 25, showing that the packet that was sent from the sender to receiver of seq 25 is confirmed as received.
+	The RWindow remains 3, showing that there has been no issue with data loss so far
+	
+	The next response from receiver to sender contains a seq of 2335809728, an ack of 3636175324, and RWindow of 3
+	The seq again remains the same because there has been no payload from receiver to sender
+	The relative ack is now 1473, acknowledging the receipt of the packet from sender to receiver, whos relative seq was 1473
+	The Rwindow remains the same, due to a lack of data loss
+	
+	
+	For the third TCP flow, initiated between port 43502 of 130.208.2.198 and port 80 of 128.208.2.198:
+	
+	After the 3 way handshake is completed, on the fourt message, we have a Seq number of 2558634629, and ack of 3429921723, and Rwindow of 3.
+	
+	The next packet send from sender to receiver has seq 2558634654, ack of 3429921723, and Rwindow of 3.
+	This shows a relative seq of 25, and a relative ack of 1
+	Therefore, 24 bytes were sent, and none received, Rwindow remains the same because there has been no receiving loss of data (or received data)
+	
+	The next packet sent from sender to receiver has a seq of 2558636102, ack of 3429921723, and Rwindow of 3
+	This is a relative seq of 1473, showing that a payload of size 1448 is being sent.
+	The Ack remains the same,with a relative value of 1, showing that there have still been no received bytes
+	and Rwindow remains 3, showing that there is still no loss reported
+	
+	7 more outgoing packets from sender to receiver go out before a response is received from receiver to sender
+	In this response we get a seq of 3429921723, an ack of 2558634654, and an Rwindow of 3.
+	This show a relative seq of 1, showing there have been no outgoing payloads from receiver to sender
+	This shows a relative ack of 25, confirming that the receiver received the packet which contained the relative seq of 25.
+	
+	The next response from the receiver to sender has a seq of 3429921723, an ack of 2558636102, and Rwindow of 3
+	This shows a relative seq of 1, which shows that there have still been no outgoing payloads from receiver to sender
+	This show a relative ack of 1473, confirming the receipt of its corresponding packet that was sent from sender to receiver
+	
