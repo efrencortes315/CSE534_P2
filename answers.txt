@@ -88,3 +88,18 @@ Project 2 Answers
 	This shows a relative seq of 1, which shows that there have still been no outgoing payloads from receiver to sender
 	This show a relative ack of 1473, confirming the receipt of its corresponding packet that was sent from sender to receiver
 	
+	
+	B)To estimate throughput I first added a variable within my program that kept track of the total number of bytes sent, per flow, per outgoing message
+	This would include all data and headers as it is a full count of all bytes sent in each flow
+	
+	Then I took the relative ACK of each flows final ACK, which would show the amount of payload data received on the receiving end.
+	and I found the time each flow took, by subtracting the time of each SYN from the time of each FIN, ACK
+	
+	Flow 1 : total bytes sent = 10557402		Flow 1: ending relative ACK = 10092570 			Total time from SYN to FIN = 2.010382
+	Flow 2 : total bytes sent = 10695176		Flow 2: ending relative ACK = 10092570			Total time from SYN to FIN = 8.247912
+	Flow 3 : total bytes sent = 1096722			Flow 3: ending relative ACK = 1048602			Total time from SYN to FIN = 0.676604
+	
+	Flow 1 throughput is 5251441 bytes per second
+	Flow 2 throughput is 1296713 bytes per second
+	Flow 3 throughput is 16209215 bytes per second
+	

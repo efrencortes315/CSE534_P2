@@ -8,6 +8,9 @@ import java.math.BigInteger;
 class analysis_pcap_tcp{
 	static int initCount = 0;
 	static int numFlows = 0;
+	static ArrayList<BigInteger> totalBytes = new ArrayList<BigInteger>();
+	static ArrayList<Long> beginAcks = new ArrayList<Long>();
+	static ArrayList<Long> endAcks = new ArrayList<Long>();
 	//  javac -classpath jnetpcap.jar analysis_pcap_tcp.java to compile using the imported library
 	
 	///     copy the jnetpcap.dll library file, found at root of jnetpcap's
@@ -42,7 +45,9 @@ class analysis_pcap_tcp{
 			int j=0;
 		System.out.println("Total of number of flows initiated by the sender is: " + numFlows);
 		System.out.println();
+		
 		for(int q = 0;q<theFlowPortNums.size();q++){
+			
 			while(i<length){
 				
 				if(theFlowPortNums.get(q)== table[j][3] || theFlowPortNums.get(q)==table[j][4]){
@@ -58,6 +63,8 @@ class analysis_pcap_tcp{
 				}
 			j++;
 			}
+			System.out.println();
+			System.out.println("Total outgoing bytes for entire flow: " + totalBytes.get(q).toString());
 			i=0;
 			j=0;
 			System.out.println();System.out.println();
@@ -66,6 +73,8 @@ class analysis_pcap_tcp{
 	}
 	public static long[][] packInfo(ArrayList<Integer>theFlowPortNums, ArrayList<byte[]> packetsFromFile){
 		long[][] table = new long[packetsFromFile.size()][5];
+		/*boolean start = false;
+		boolean end = false;*/
 		for(int i=0;i<packetsFromFile.size();i++){ //this will go through each packet
 						
 				int byte34 = packetsFromFile.get(i)[34];//34 and 35 for port numb
@@ -85,10 +94,14 @@ class analysis_pcap_tcp{
 			if(packetsFromFile.get(i)[47]==2){  // packet of type SYN is sent, initiating a new TCP flow  1 would be for FIN and 16 for ACK
 				
 				theFlowPortNums.add(oPort); //this number will match the list of its port
+				totalBytes.add(new BigInteger("0"));
+				start=true;
 				numFlows++;
 				
 				
-			}
+			}/*if(packetsFromFile.get(i)[47]==17){
+				end=true;
+			}*/
 			
 			//Sequence Number Calculation// bytes 38-41
 			long seqNum=0;
@@ -124,6 +137,12 @@ class analysis_pcap_tcp{
 			if(byte45<0){byte45+=256;}
 			ackNum+= (long)byte45;
 			table[i][1] = ackNum;
+			
+			/*if(end){
+				for(int p=0;p<theFlowPortNums.size();p++){
+					if(
+				}
+			}*/
 			//end Acknowledgement calculation//
 			
 			//Receiving Window Calculation//
@@ -134,6 +153,13 @@ class analysis_pcap_tcp{
 			long rWindow = (byte48 << 8)+ byte49;
 			table[i][2] = rWindow; //apparently, besides in the initial handshake, 
 			//end Receiving Window Calculation//
+			
+			for(int q=0;q<theFlowPortNums.size();q++){
+				if(rPort==80 && theFlowPortNums.get(q)==oPort){
+					totalBytes.set(q, totalBytes.get(q).add(new BigInteger(Long.toString(packetsFromFile.get(i).length)))); //adds total bytes outgoing
+				}
+				
+			}
 		}
 		return table;
 	}
