@@ -103,3 +103,15 @@ Project 2 Answers
 	Flow 2 throughput is 1296713 bytes per second
 	Flow 3 throughput is 16209215 bytes per second
 	
+	Here, I define loss rate as total number of retransmissions (to replicate total number of packets not received), divided by the total number of
+	packets sent.  These numbers are calculated in my code and are output when running the code from Part A
+	
+	Flow 1 : Total retransmissions = 4, Total packets sent = 6977, Loss rate =  0.00057
+	Flow 2 : Total retransmissions = 95, Total packets sent = 7068, Loss rate = 0.01344
+	Flow 3 : Total retransmissions = 1, Total packets sent = 729, Loss rate = 0.00137
+	
+	Average RTT: the average time it took per packet to send and receive confirmation
+	
+	Flow 1: 6977 packets sent, 2.010381 total time : RTT of 0.0002881440
+	Flow 2: 7068 packets sent, 8.247912 total time : RTT of 0.0011669372
+	Flow 3: 729 packets sent, 0.676604 total time : RTT of .000928126200

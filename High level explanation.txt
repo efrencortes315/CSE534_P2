@@ -1,0 +1,11 @@
+First, many static variables are declared in order for tracking certain statistics, I used ArrayLists that could dynamically adjust
+to different pcap files with different numbers of flows if need be. 
+
+The readPacktsFromFile function, takes the pcap file given, and returns an arraylist of byte[], which are the bytecode of the network communications
+
+The packInfo function, then takes this newly acquired information and goes into the nitty gritty of it,
+analyzing each byte for its pertinant information and bitshifting when necessary to acquire the proper information,
+it returns a 2d array of longs, which are a list of the packets each with its own list of the pertinant information,
+the format is table[packetNumber][n] where n = {0:seq 1:ack 2:rwind 3:sendPort 4:receivePort}
+
+Then outputInfo is called, which is a void function, only outputting all the information in a readable format within the console.

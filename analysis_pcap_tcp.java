@@ -11,6 +11,10 @@ class analysis_pcap_tcp{
 	static ArrayList<BigInteger> totalBytes = new ArrayList<BigInteger>();
 	static ArrayList<Long> beginAcks = new ArrayList<Long>();
 	static ArrayList<Long> endAcks = new ArrayList<Long>();
+	static ArrayList<ArrayList<Long>> listsOfSentSeqs = new ArrayList<ArrayList<Long>>();
+	static ArrayList<Integer> numReTrans = new ArrayList<Integer>();
+	static ArrayList<Integer> numPacketsSent = new ArrayList<Integer>();
+	static ArrayList<Long> endingTimes = new ArrayList<Long>();
 	//  javac -classpath jnetpcap.jar analysis_pcap_tcp.java to compile using the imported library
 	
 	///     copy the jnetpcap.dll library file, found at root of jnetpcap's
@@ -65,6 +69,8 @@ class analysis_pcap_tcp{
 			}
 			System.out.println();
 			System.out.println("Total outgoing bytes for entire flow: " + totalBytes.get(q).toString());
+			System.out.println("Total outgoing packets for entire flow: " + numPacketsSent.get(q).toString());
+			System.out.println("Total number of retransmissions for entire flow: " + numReTrans.get(q).toString());
 			i=0;
 			j=0;
 			System.out.println();System.out.println();
@@ -95,14 +101,31 @@ class analysis_pcap_tcp{
 				
 				theFlowPortNums.add(oPort); //this number will match the list of its port
 				totalBytes.add(new BigInteger("0"));
-				start=true;
+				//start=true;
+				listsOfSentSeqs.add(new ArrayList<Long>());
+				numReTrans.add(0);
+				numPacketsSent.add(0);
 				numFlows++;
+				endingTimes.add((long)0);
 				
+			}
+			long timeStamp = 0;
+			if(packetsFromFile.get(i)[47]==17){
 				
-			}/*if(packetsFromFile.get(i)[47]==17){
-				end=true;
-			}*/
-			
+				int byte62 = packetsFromFile.get(i)[62];
+				if(byte62<0){byte62+=256;}
+				timeStamp = (long)byte62;
+				int byte63 = packetsFromFile.get(i)[63];
+				if(byte63<0){byte63+=256;}
+				timeStamp = (timeStamp<<8) + (long)byte63;
+				int byte64 = packetsFromFile.get(i)[64];
+				if(byte64<0){byte64+=256;}
+				timeStamp = (timeStamp<<8) + (long)byte64;
+				int byte65 = packetsFromFile.get(i)[65];
+				if(byte65<0){byte65+=256;}
+				timeStamp = (timeStamp<<8) + (long)byte65;
+				
+			}
 			//Sequence Number Calculation// bytes 38-41
 			long seqNum=0;
 			int byte38 = packetsFromFile.get(i)[38];
@@ -137,12 +160,6 @@ class analysis_pcap_tcp{
 			if(byte45<0){byte45+=256;}
 			ackNum+= (long)byte45;
 			table[i][1] = ackNum;
-			
-			/*if(end){
-				for(int p=0;p<theFlowPortNums.size();p++){
-					if(
-				}
-			}*/
 			//end Acknowledgement calculation//
 			
 			//Receiving Window Calculation//
@@ -155,8 +172,18 @@ class analysis_pcap_tcp{
 			//end Receiving Window Calculation//
 			
 			for(int q=0;q<theFlowPortNums.size();q++){
+				if(timeStamp!=0 && theFlowPortNums.get(q)==rPort){
+					endingTimes.add(timeStamp);
+				}
 				if(rPort==80 && theFlowPortNums.get(q)==oPort){
 					totalBytes.set(q, totalBytes.get(q).add(new BigInteger(Long.toString(packetsFromFile.get(i).length)))); //adds total bytes outgoing
+					numPacketsSent.set(q,numPacketsSent.get(q)+1);
+					if(listsOfSentSeqs.get(q).contains(seqNum)){
+						//System.out.println("Retransmission");
+						numReTrans.set(q,numReTrans.get(q)+1);
+					}else{
+						listsOfSentSeqs.get(q).add(seqNum);//adds the seq to a list, to later check for retransmissions
+					}
 				}
 				
 			}
