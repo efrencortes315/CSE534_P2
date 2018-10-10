@@ -1,0 +1,15 @@
+For all three flows, the sender estimates a congestion window of size 42340 and the receiver acknowledges and replies with a congestion window of 43440
+From then on, the packet uses something called a window size value, which is a factor of the actual window size (16384 is the factor shown here)
+For all of the flows shown, the rwindows initially go back and forth between 3 and 4 several times, making the first 10 window sizes several
+iterations of 3 and 4.  
+However if the instruction meant the first 10 unique window sizes, the window sizes all go up from 3-12 {3,4,5,6,7,8,9,10,11,12}
+This is nothing however compared to some of the window sizes toward the end of the flow, some even going past a 100 (over 1648400 counting the factor)
+The code I have attached currently shows the first 10 changes to the window, although I previously output the first 12 unique windows
+by using an arraylist to store each unique window, but I wasnt sure which one was wanted and changed it. If I have time I'll go back and have my code output both.
+
+I realize now I wasnt supposed to check the factor out in wireshark(how i came up with 16348).  If I was to estimate myself, I would 
+take 43440 (the cWnd from the receiver) and divide it by 3 (the initial window size value) and just multiply any further window size values by that
+(14480);  This estimation would be done at the sender, because they need to estimate how large of packets they can send out.
+
+I noticed that most duplicate ACKS were sent many times over 3 times, I assume because of the amount of packets being sent at one time is quite large.
+This leads me to believe that the sender is waiting for a timeout before resending, rather than acting on a triple duplicate ACK.
