@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.io.*;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import java.math.BigInteger;
+import java.util.Scanner;
 class analysis_pcap_tcp{
 	static int initCount = 0;
 	static int numFlows = 0;
@@ -25,6 +26,11 @@ class analysis_pcap_tcp{
 	//the data it's received to the code that's reading the data (program, or library used by a program), it should do so at that point.
 	
 	public static void main(String[] args){
+		Scanner reader = new Scanner(System.in);
+		System.out.println("Enter number of messages to show per flow");
+		int z = reader.nextInt();
+		String filename = "http_1080.pcap";
+		reader.close();
 		String pcapFile = "assignment2.pcap";
 		ArrayList<byte[]> packetsFromFile = readPacktsFromFile(pcapFile); // reads packets from file and converts into accessible byte array
 		
@@ -34,7 +40,7 @@ class analysis_pcap_tcp{
 		
 			
 		
-		outputPacketInfo(theFlowPortNums,table, 20); //takes all of the information and displays neatly, the first n transactions per flow
+		outputPacketInfo(theFlowPortNums,table, z); //takes all of the information and displays neatly, the first n transactions per flow
 			
 			
 			
@@ -51,8 +57,10 @@ class analysis_pcap_tcp{
 		System.out.println();
 		
 		for(int q = 0;q<theFlowPortNums.size();q++){
-			
-			while(i<length){
+			if(length==-1){
+				length=table.length;
+			}
+			while(i<length && j<table.length){
 				
 				if(theFlowPortNums.get(q)== table[j][3] || theFlowPortNums.get(q)==table[j][4]){
 					//if(initSeq<=0){initSeq=table[j][0];}

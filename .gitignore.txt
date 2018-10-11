@@ -1,4 +1,0 @@
-com/*
-META-INF/*
-org/*
-resources/*

@@ -66,6 +66,12 @@ class analysis_pcap_http{
 		int i=0;
 		int j=0;
 		System.out.println("Total of number of unique HTTP response/requests is: " + numFlows);
+		if(numFlows<=2){
+			System.out.println("I believe this HTTP protocol was either SPDY or pipelining, due to the small amount of seperate TCP flows");
+		}if(numFlows>=6){
+			System.out.println("This HTTP protocol is using paralell TCP connections, so It may be HTTP 1.1");
+			
+		}
 		System.out.println();
 		
 		for(int q = 0;q<theFlowPortNums.size();q++){
@@ -80,8 +86,7 @@ class analysis_pcap_http{
 					String asb="";
 					if(table[j][3]==80){asl = "\t";}
 					if(table[j][1]==0){asb = "\t";}
-					//if(j==0){starting=table[j][0]+1;}
-					//if(ending<table[j][1]){ending=table[j][1];}
+					
 					System.out.println("Seq: " + table[j][0] + "\t\tAck: " + table[j][1] + asb + "\t\tRWind: " + table[j][2] + "\t\tFrom:" + table[j][3] +asl+ "\tTo: " + table[j][4]);
 					i++;
 				

@@ -1,0 +1,26 @@
+I have attatched the PCAP files of the network communications referred to in part C, they are saved as directed,
+as http_1080.pcap, tcp_1081.pcap, and tcp_1082.pcap  
+
+
+C1) I wrote program analysis_pcap_http.java, and the output of this program splits all the flows up into each individual TCP flow,
+which I had assumed each represented a seperate object, I now believe myself to have made a mistake after answering the questions and 
+analyzing further, however I am out of time and have to go to work.
+
+C2) http_1080.pcap and tcp_1081.pcap use paralell connections, perhaps HTTP 1.1, while tcp_1082.pcap uses 1 connection like HTTP 2 or SPDY
+
+C3) Finally, after you’ve labeled the PCAPs with their appropriate versions of HTTP, answer
+the following: Which version of the protocol did the site load the fastest under? The
+Slowest? Which sent the most number of packets and raw bytes? Which protocol sent
+the least? Report your results and write a brief explanation for your observations.
+
+The site loaded fastest under the protocol of tcp_1082.pcap, which obviously used 1 tcp connection rather than many paralell connections.
+The site loaded slowest under the protocol of tcp_1081.pcap, which used 6 paralell connections
+
+http1080.pcap sent 1620 packets and 2245 bytes
+tcp1081.pcap sent 1610 packets and 2258 bytes
+tcp1082.pcap sent 1611 packets and 2279 bytes
+
+Because they all sent a very similar amount of packets and bytes, we can see a clear superiority of the protocol in tcp1080 and tcp1082
+over tcp1081.  The speed granted in 1080 is likely due to the fact that it doesnt have to deal with the encryption that tcp1081 does.
+However, tcp1082 deals with encryption and still beats tcp1080 in speed, proving the superiority of what i assume is SPDY
+
